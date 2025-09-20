@@ -40,13 +40,31 @@ class PlagiarismChecker:
         print(f"查重完成！重复率：{similarity:.2%}")
         return similarity
 
+    def check_plagiarism(self, original_path, copied_path, output_path=None):
+        original_text = self.read_file(original_path)
+        copied_text = self.read_file(copied_path)
+        similarity = self.calculate_similarity(original_text, copied_text)
+
+        if output_path:
+            try:
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(f"{similarity:.2f}")
+                print(f"结果已保存到：{output_path}")
+            except Exception as e:
+                print(f"写入输出文件时出错：{e}")
+                sys.exit(1)
+
+        print(f"查重完成！重复率：{similarity:.2%}")
+        return similarity
+
 def main():
-    if len(sys.argv) != 3:
-        print("用法: python plagiarism_checker.py <原文文件> <抄袭版文件>")
+    if len(sys.argv) < 3:
+        print("用法: python plagiarism_checker.py <原文文件> <抄袭版文件> [输出文件]")
         sys.exit(1)
 
     checker = PlagiarismChecker()
-    checker.check_plagiarism(sys.argv[1], sys.argv[2])
+    output_path = sys.argv[3] if len(sys.argv) > 3 else None
+    checker.check_plagiarism(sys.argv[1], sys.argv[2], output_path)
 
 if __name__ == "__main__":
     main()
