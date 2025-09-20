@@ -5,6 +5,7 @@ import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
+import datetime
 
 class PlagiarismChecker:
     def __init__(self):
@@ -33,29 +34,29 @@ class PlagiarismChecker:
             print(f"读取文件时出错：{e}")
             sys.exit(1)
 
-    def check_plagiarism(self, original_path, copied_path):
-        original_text = self.read_file(original_path)
-        copied_text = self.read_file(copied_path)
-        similarity = self.calculate_similarity(original_text, copied_text)
-        print(f"查重完成！重复率：{similarity:.2%}")
-        return similarity
-
     def check_plagiarism(self, original_path, copied_path, output_path=None):
         original_text = self.read_file(original_path)
         copied_text = self.read_file(copied_path)
         similarity = self.calculate_similarity(original_text, copied_text)
 
         if output_path:
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             try:
-                with open(output_path, 'w', encoding='utf-8') as f:
-                    f.write(f"{similarity:.2f}")
-                print(f"结果已保存到：{output_path}")
+                with open(output_path, 'a', encoding='utf-8') as f:
+                    f.write(f"\n{'=' * 50}\n")
+                    f.write(f"查重时间：{current_time}\n")
+                    f.write(f"原文文件：{original_path}\n")
+                    f.write(f"对比文件：{copied_path}\n")
+                    f.write(f"重复率：{similarity:.2%}\n")
+                    f.write(f"相似度分数：{similarity:.4f}\n")
+                print(f"结果已追加保存到：{output_path}")
             except Exception as e:
                 print(f"写入输出文件时出错：{e}")
                 sys.exit(1)
 
         print(f"查重完成！重复率：{similarity:.2%}")
         return similarity
+
 
 def main():
     if len(sys.argv) < 3:
